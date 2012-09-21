@@ -1,6 +1,6 @@
 package MasonX::Resolver::AutoInherit;
 {
-  $MasonX::Resolver::AutoInherit::VERSION = '0.001';
+  $MasonX::Resolver::AutoInherit::VERSION = '0.002';
 }
 use Moose;
 # ABSTRACT: a resolver that lets you specialize components with dir overlays
@@ -40,6 +40,13 @@ has add_next_call => (
   isa => 'Bool',
   default => 1,
 );
+
+has comp_class => (
+  is  => 'ro',
+  isa => 'Str',
+  default => 'HTML::Mason::Component::FileBased',
+);
+
 
 sub get_info {
   my ($self, $given_path, $comp_root_key, $comp_root_path) = @_;
@@ -87,7 +94,7 @@ sub get_info {
     comp_id       => "$base:$seen_in[0][0]=$seen_in[0][1]",
     last_modified => $modified,
     comp_path     => $given_path,
-    comp_class    => 'HTML::Mason::Component::FileBased',
+    comp_class    => $self->comp_class,
     extra         => { comp_root => $comp_root_key },
     source_callback => sub {
       my $body .= ${ read_file_ref($srcfile) };
@@ -114,7 +121,7 @@ MasonX::Resolver::AutoInherit - a resolver that lets you specialize components w
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
@@ -179,6 +186,16 @@ refer to F</shared=/welcome>.
 This is pretty experimental code.  It also probably doesn't work with some
 Mason options that I don't use, like preloading, because I haven't implemented
 the C<glob_path> method.
+
+=head1 ATTRIBUTES
+
+=head2 comp_class
+
+This argument is the class that will be used for components created by this
+resolver.  The default is HTML::Mason::Component::FileBased.
+
+Because MasonX::Resolver::AutoInherit is not (right now) part of
+Class::Container, you can't pass this as an argument to the interp constructor.
 
 =head1 AUTHOR
 
